@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRIEF - Bias & Research Intelligence Evaluation Framework</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    /* Backgrounds - wider contrast steps so surfaces read as elevated */
+    --bg:       #080a0e;
+    --surface:  #0f1219;
+    --surface2: #161921;
+    --surface3: #1c2029;
+
+    /* Borders */
+    --border:   #1e2230;
+    --border2:  #272d3e;
+
+    /* Accent - purple */
+    --accent:        #7c6fff;
+    --accent-dim:    rgba(124,111,255,0.1);
+    --accent-border: rgba(124,111,255,0.22);
+    --accent-hover:  #6a5fe8;
+    --danger-light: #e88888;
+
+    /* Semantic colours */
+    --amber:      #d4962e;
+    --amber-dim:  rgba(212,150,46,0.1);
+    --danger:     #d95252;
+    --danger-dim: rgba(217,82,82,0.1);
+    --ok:         #3aaa6e;
+    --ok-dim:     rgba(58,170,110,0.1);
+
+    /* Text */
+    --text:   #ede9e0;
+    --text2:  #9a9690;
+    --muted:  #585860;
+
+    /* Type */
+    --mono: 'Space Mono', monospace;
+    --sans: 'Atkinson Hyperlegible', sans-serif;
+
+    /* Spacing scale */
+    --sp-1:  4px;
+    --sp-2:  8px;
+    --sp-3:  12px;
+    --sp-4:  16px;
+    --sp-5:  20px;
+    --sp-6:  24px;
+    --sp-8:  32px;
+    --sp-10: 40px;
+    --sp-12: 48px;
+
+    /* Type scale */
+    --text-xs:  11px;
+    --text-sm:  13px;
+    --text-base: 15px;
+    --text-md:  17px;
+    --text-lg:  20px;
+    --text-xl:  28px;
+    --text-2xl: 46px;
+
+    --radius:    6px;
+    --radius-lg: 10px;
+    --radius-sm: 3px;
+    --radius-pill: 20px;
+
+    /* Line-height scale */
+    --lh-tight:  1.08;
+    --lh-snug:   1.3;
+    --lh-normal: 1.5;
+    --lh-relaxed: 1.65;
+    --lh-loose:  1.7;
+
+    /* Letter-spacing scale */
+    --ls-tight:  -0.02em;
+    --ls-normal: -0.01em;
+    --ls-wide:   0.05em;
+    --ls-wider:  0.08em;
+    --ls-widest: 0.12em;
+    --ls-ultra:  0.22em;
+    --ls-micro:  0.008em;
+    --ls-badge:  0.04em;
+
+    /* Transitions */
+    --t-fast:   0.12s ease;
+    --t-base:   0.18s ease;
+    --t-slow:   0.3s ease;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: var(--text-base);
+    line-height: var(--lh-relaxed);
+    min-height: 100vh;
+    letter-spacing: var(--ls-micro);
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-4) var(--sp-12);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 200;
+  }
+
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-3);
+  }
+
+  .logo-name {
+    font-family: var(--mono);
+    font-size: var(--text-base);
+    font-weight: 700;
+    letter-spacing: var(--ls-ultra);
+    color: var(--text);
+  }
+
+  .logo-pipe {
+    width: 1px;
+    height: 14px;
+    background: var(--border2);
+    align-self: center;
+  }
+
+  .logo-full {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wide);
+    color: var(--muted);
+    line-height: var(--lh-normal);
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .foundry-badge {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--radius);
+  }
+
+  /* MAIN LAYOUT */
+  .page-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--sp-12) 80px;
+  }
+
+  /* LANDING STATE */
+  #landing {
+    display: block;
+  }
+
+  /* RESULTS STATE */
+  #results-view {
+    display: none;
+  }
+
+  /* HERO */
+  .hero {
+    padding: var(--sp-18) 0 var(--sp-12);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+    max-width: 700px;
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 0; right: -200px;
+    width: 500px; height: 300px;
+    background: radial-gradient(circle, rgba(124,111,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-widest);
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--sp-5);
+  }
+
+  .hero h1 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-tight);
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--text2);
+  }
+
+  .hero-body {
+    font-size: var(--text-md);
+    color: var(--text2);
+    line-height: var(--lh-loose);
+    max-width: 520px;
+  }
+
+  /* INPUT SECTION */
+  .input-section {
+    margin-bottom: var(--sp-12);
+  }
+
+  .input-label {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-widest);
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .textarea-wrap {
+    position: relative;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    transition: border-color var(--t-base);
+  }
+
+  .textarea-wrap:focus-within {
+    border-color: var(--accent);
+  }
+
+  textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: var(--text-base);
+    line-height: var(--lh-loose);
+    padding: var(--sp-5) var(--sp-6);
+    resize: none;
+    min-height: 160px;
+    outline: none;
+    letter-spacing: var(--ls-micro);
+  }
+
+  textarea::placeholder { color: var(--muted); }
+
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-3) var(--sp-5) var(--sp-4);
+    border-top: 1px solid var(--border);
+  }
+
+  .input-hint {
+    font-size: var(--text-xs);
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .btn-run {
+    background: var(--accent);
+    color: white;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    padding: var(--sp-3) var(--sp-6);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background var(--t-fast), transform var(--t-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .btn-run:hover  { background: var(--accent-hover); }
+  .btn-run:active { transform: scale(0.98); }
+  .btn-run:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-run:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* ERROR */
+  .error-box {
+    background: var(--danger-dim);
+    border: 1px solid rgba(217,79,79,0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    color: var(--danger-light);
+    font-size: var(--text-sm);
+    display: none;
+    margin-bottom: 20px;
+  }
+
+  /* PROGRESS */
+  #progress-section {
+    display: none;
+    margin-bottom: 40px;
+  }
+
+  .progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .progress-status {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--accent);
+    letter-spacing: var(--ls-wide);
+  }
+
+  .progress-pct {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--muted);
+  }
+
+  .progress-track {
+    height: 2px;
+    background: var(--border2);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: var(--radius-sm);
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--sp-2);
+  }
+
+  @media (max-width: 700px) {
+    .steps-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .step-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-3) var(--sp-3);
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--muted);
+    line-height: var(--lh-normal);
+    transition: all var(--t-slow);
+  }
+
+  .step-cell.active {
+    border-color: var(--accent-border);
+    background: var(--accent-dim);
+    color: var(--text);
+  }
+
+  .step-cell.done {
+    border-color: rgba(58,170,110,0.25);
+    background: var(--ok-dim);
+    color: var(--ok);
+  }
+
+  .step-num {
+    font-size: var(--text-xs);
+    opacity: 0.5;
+    margin-bottom: 3px;
+  }
+
+  /* RESULTS TWO-COLUMN LAYOUT */
+  .results-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: var(--sp-10);
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .results-layout { grid-template-columns: 1fr; }
+  }
+
+  /* SIDEBAR NAV */
+  .results-nav {
+    position: sticky;
+    top: 72px;
+  }
+
+  .nav-header {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-widest);
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 0 var(--sp-3);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-3);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background var(--t-fast), border-color var(--t-fast);
+    border: 1px solid transparent;
+    margin-bottom: 3px;
+  }
+
+  .nav-item:hover {
+    background: var(--surface2);
+  }
+
+  .nav-item:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .nav-item.active {
+    background: var(--accent-dim);
+    border-color: var(--accent-border);
+    position: relative;
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -1px; top: 50%;
+    transform: translateY(-50%);
+    width: 2px; height: 60%;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  .nav-num {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--muted);
+    margin-top: 2px;
+    flex-shrink: 0;
+    width: 16px;
+  }
+
+  .nav-item.active .nav-num {
+    color: var(--accent);
+  }
+
+  .nav-label {
+    font-size: var(--text-sm);
+    color: var(--text2);
+    line-height: var(--lh-snug);
+  }
+
+  .nav-item.active .nav-label {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .nav-divider {
+    height: 1px;
+    background: var(--border);
+    margin: var(--sp-2) 0;
+  }
+
+  .btn-new {
+    width: 100%;
+    margin-top: 16px;
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color var(--t-fast), color var(--t-fast);
+  }
+
+  .btn-new:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-export {
+    width: 100%;
+    margin-top: var(--sp-4);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background var(--t-fast);
+  }
+
+  .btn-export:hover { background: rgba(124,111,255,0.18); }
+  .btn-export:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* -- CONFIDENCE GAUGE -- */
+  .confidence-hero {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-8);
+    margin-bottom: var(--sp-5);
+    display: flex;
+    gap: var(--sp-8);
+    align-items: center;
+  }
+
+  @media (max-width: 700px) {
+    .confidence-hero { flex-direction: column; text-align: center; }
+  }
+
+  .gauge {
+    flex-shrink: 0;
+    position: relative;
+    width: 132px;
+    height: 132px;
+  }
+
+  .gauge svg { transform: rotate(-90deg); }
+  .gauge { filter: drop-shadow(0 0 12px rgba(124,111,255,0.15)); }
+
+  .gauge-track { fill: none; stroke: var(--border2); stroke-width: 10; }
+
+  .gauge-fill {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .gauge-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gauge-num {
+    font-family: var(--mono);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .gauge-unit {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .confidence-detail { flex: 1; }
+
+  .confidence-label-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--sp-3);
+  }
+
+  .confidence-headline {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text);
+    line-height: var(--lh-snug);
+    margin-bottom: var(--sp-3);
+  }
+
+  .confidence-rationale {
+    font-size: var(--text-sm);
+    color: var(--text2);
+    line-height: var(--lh-relaxed);
+  }
+
+  /* -- SUMMARY DASHBOARD GRID -- */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-5);
+  }
+
+  @media (max-width: 700px) { .summary-grid { grid-template-columns: 1fr; } }
+
+  .summary-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    cursor: pointer;
+    transition: border-color var(--t-base), background var(--t-base);
+  }
+
+  .summary-tile:hover {
+    border-color: var(--accent-border);
+    background: var(--surface2);
+    transform: translateY(-2px);
+  }
+
+  .summary-tile-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-2);
+  }
+
+  .summary-tile-label {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .summary-tile-finding {
+    font-size: var(--text-sm);
+    color: var(--text2);
+    line-height: var(--lh-normal);
+  }
+
+  .risk-list {
+    counter-reset: risk;
+    margin-top: var(--sp-3);
+  }
+
+  .risk-item {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: flex-start;
+    padding: var(--sp-3) 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .risk-num {
+    font-family: var(--mono);
+    font-size: var(--text-sm);
+    color: var(--danger);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .risk-text { font-size: var(--text-sm); color: var(--text2); }
+
+  /* CONTENT PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.4s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel.active { animation: none; }
+    * { transition: none !important; }
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    margin-bottom: 6px;
+  }
+
+  .section-eyebrow {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .section-title h2 {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    letter-spacing: var(--ls-normal);
+    margin-bottom: 6px;
+  }
+
+  .section-title p {
+    color: var(--text2);
+    font-size: var(--text-sm);
+    max-width: 580px;
+    margin-bottom: 24px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-6) var(--sp-6);
+    margin-bottom: var(--sp-4);
+    transition: border-color var(--t-base);
+  }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-widest);
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .card p {
+    color: var(--text2);
+    font-size: var(--text-sm);
+  }
+
+  .card p + p { margin-top: 8px; }
+
+  .card-divider {
+    height: 1px;
+    background: var(--border);
+    margin: var(--sp-4) 0;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* META PILLS */
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+
+  .meta-pill {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-1);
+    font-size: var(--text-xs);
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: var(--sp-1) var(--sp-3);
+  }
+
+  .meta-key {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    color: var(--muted);
+  }
+
+  .meta-val {
+    color: var(--text2);
+    font-size: var(--text-xs);
+  }
+
+  /* ASSUMPTION ITEMS */
+  .assumption-item {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    margin-bottom: var(--sp-3);
+  }
+
+  .assumption-theme {
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .assumption-freq {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--accent);
+    margin-bottom: 7px;
+  }
+
+  .assumption-desc {
+    font-size: var(--text-sm);
+    color: var(--text2);
+  }
+
+  .assumption-quote {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--muted);
+    margin-top: 8px;
+    padding-left: 10px;
+    border-left: 2px solid var(--border2);
+    line-height: var(--lh-normal);
+  }
+
+  /* SCORE BADGES */
+  .badge-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: var(--sp-1) var(--sp-2);
+    border-radius: var(--radius-sm);
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--ls-badge);
+    white-space: nowrap;
+  }
+
+  .s-low      { background: var(--ok-dim);     color: var(--ok);    border: 1px solid rgba(58,170,110,0.25); }
+  .s-medium   { background: var(--amber-dim);  color: var(--amber); border: 1px solid rgba(200,144,42,0.3); }
+  .s-high     { background: var(--danger-dim); color: var(--danger);border: 1px solid rgba(217,79,79,0.3); }
+  .s-critical { background: rgba(217,79,79,0.18); color: var(--danger-light); border: 1px solid rgba(217,79,79,0.4); }
+
+  /* HYPOTHESIS ITEMS */
+  .hyp-item {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-5) var(--sp-5);
+    margin-bottom: var(--sp-3);
+  }
+
+  .hyp-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hyp-text {
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--text);
+    flex: 1;
+  }
+
+  .score-track {
+    height: 3px;
+    background: var(--border2);
+    border-radius: var(--radius-sm);
+    margin: var(--sp-1) 0 var(--sp-3);
+    overflow: hidden;
+  }
+
+  .score-fill {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .score-fill.low      { background: var(--ok); }
+  .score-fill.medium   { background: var(--amber); }
+  .score-fill.high     { background: var(--danger); }
+  .score-fill.critical { background: var(--danger-light); }
+
+  .hyp-explanation { font-size: var(--text-sm); color: var(--text2); margin-bottom: 7px; }
+  .hyp-rec { font-size: var(--text-sm); color: var(--text); }
+  .hyp-rec::before { content: "→ "; color: var(--accent); }
+
+  /* BRAND TABLE */
+  .brand-table { width: 100%; border-collapse: collapse; }
+
+  .brand-table th {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    color: var(--muted);
+    text-align: left;
+    padding: var(--sp-2) var(--sp-3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand-table td {
+    font-size: var(--text-sm);
+    color: var(--text2);
+    padding: var(--sp-3) var(--sp-3);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .brand-table td:first-child { color: var(--text); font-weight: 700; }
+  .brand-table tr:last-child td { border-bottom: none; }
+
+  /* TAGS */
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    padding: var(--sp-1) var(--sp-2);
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text2);
+  }
+
+  .tag.absent {
+    border-color: rgba(217,79,79,0.25);
+    color: var(--danger-light);
+    background: rgba(217,79,79,0.05);
+  }
+
+  /* UNKNOWN UNKNOWNS */
+  .unknown-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--surface2);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    margin-bottom: var(--sp-2);
+  }
+
+  .unknown-q {
+    font-family: var(--mono);
+    font-size: var(--text-sm);
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .unknown-text { font-size: var(--text-sm); color: var(--text2); }
+
+  /* DRIFT ITEMS */
+  .drift-item {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    margin-bottom: var(--sp-3);
+  }
+
+  .drift-assumption { font-weight: 700; font-size: var(--text-sm); color: var(--amber); margin-bottom: 4px; }
+  .drift-why        { font-size: var(--text-sm); color: var(--text2); margin-bottom: 6px; }
+  .drift-impl       { font-size: var(--text-sm); color: var(--text); }
+  .drift-impl::before { content: "→ "; color: var(--amber); }
+
+  /* METHOD ITEMS */
+  .method-item {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    margin-bottom: var(--sp-3);
+  }
+
+  .method-dim { font-weight: 700; font-size: var(--text-sm); color: var(--text); margin-bottom: 3px; }
+  .method-rec { font-family: var(--mono); font-size: var(--text-xs); color: var(--ok); margin-bottom: 7px; }
+  .method-rationale { font-size: var(--text-sm); color: var(--text2); }
+  .method-risk { font-size: var(--text-xs); color: var(--danger); margin-top: 6px; }
+
+  /* SOURCE ITEMS */
+  .source-item {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    margin-bottom: var(--sp-3);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .inf-pill {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    padding: var(--sp-1) var(--sp-2);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .inf-dominant    { background: var(--danger-dim); color: var(--danger); }
+  .inf-significant { background: var(--amber-dim);  color: var(--amber); }
+  .inf-marginal    { background: var(--accent-dim);  color: var(--accent); }
+  .inf-absent      { background: var(--surface);     color: var(--muted); }
+
+  .source-type { font-weight: 700; font-size: var(--text-sm); color: var(--text); margin-bottom: 4px; }
+  .source-contrib { font-size: var(--text-sm); color: var(--text2); margin-bottom: 5px; }
+  .source-voice { font-family: var(--mono); font-size: var(--text-xs); color: var(--muted); }
+  .source-voice::before { content: "voice: "; }
+
+  /* -- FOUNDRY IQ GROUNDING -- */
+  .iq-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-3) var(--sp-4);
+    margin-bottom: var(--sp-4);
+  }
+
+  .iq-banner-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+
+  .iq-banner-text {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--accent);
+    letter-spacing: var(--ls-wide);
+  }
+
+  .citation {
+    display: block;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: var(--sp-3) var(--sp-4);
+    margin-bottom: var(--sp-2);
+    text-decoration: none;
+    transition: border-color var(--t-fast);
+  }
+
+  .citation:hover { border-color: var(--accent-border); }
+
+  .citation-title {
+    font-size: var(--text-sm);
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .citation-url {
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    color: var(--muted);
+    margin-bottom: var(--sp-2);
+    word-break: break-all;
+  }
+
+  .citation-snippet {
+    font-size: var(--text-sm);
+    color: var(--text2);
+    line-height: var(--lh-normal);
+  }
+
+  /* OVER/UNDER items */
+  .gap-item {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    margin-bottom: var(--sp-2);
+  }
+
+  .gap-perspective { font-weight: 700; font-size: var(--text-sm); margin-bottom: var(--sp-1); }
+  .gap-explanation { font-size: var(--text-sm); color: var(--text2); }
+
+  /* Utility classes replacing inline styles */
+  .text-amber  { color: var(--amber); }
+  .text-danger { color: var(--danger); }
+  .text-ok     { color: var(--ok); }
+  .text-accent { color: var(--accent); }
+  .text-muted  { color: var(--muted); }
+  .text-warn   { color: var(--amber); }
+
+  .rec-heading {
+    font-size: var(--text-md);
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .card-label.no-margin { margin: 0; }
+  .card-label.mb-3 { margin-bottom: var(--sp-3); }
+  .card-label.mb-5 { margin-bottom: var(--sp-5); }
+  .card.card-mb-4 { margin-bottom: var(--sp-4); }
+  .card.card-mb-5 { margin-bottom: var(--sp-5); }
+
+  .badge-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-3);
+  }
+
+  .accent-card {
+    margin-bottom: var(--sp-4);
+    border-color: var(--accent-border);
+  }
+
+  /* Section subheading - fills the gap between card-label and h2 */
+  .subsection-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: var(--sp-3);
+    margin-top: var(--sp-5);
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-name">BRIEF</div>
+    <div class="logo-pipe"></div>
+    <div class="logo-full">Bias &amp; Research<br>Intelligence Evaluation Framework</div>
+  </div>
+  <div class="header-right">
+    <div class="foundry-badge">Microsoft Foundry</div>
+  </div>
+</header>
+
+<div class="page-wrap">
+
+  <!-- LANDING -->
+  <div id="landing">
+
+    <div class="hero">
+      <div class="hero-eyebrow">Pre-fieldwork intelligence</div>
+      <h1>Your client's brief is already<br><em>contaminated.</em><br>Find out how.</h1>
+      <p class="hero-body">Paste a research brief. BRIEF shows you what AI assumes about your topic before you go to field - whose perspective it defaults to, which client hypotheses are just AI consensus repeated back, and what your respondents have already been told.</p>
+    </div>
+
+    <div class="input-section">
+      <label class="input-label" for="brief-input">Research Brief</label>
+      <div class="textarea-wrap">
+        <textarea id="brief-input" aria-label="Research brief input" rows="8" placeholder="Paste your research brief here. Who is the client, what do they think they know, who are they researching, and where? The more context you give, the sharper the analysis."></textarea>
+        <div class="input-footer">
+          <span class="input-hint">11 reasoning steps &nbsp;·&nbsp; 60-90 seconds</span>
+          <button class="btn-run" id="run-btn" aria-live="polite" onclick="runAnalysis()">Analyse this brief &nbsp;&#9654;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <div id="progress-section" role="status" aria-live="polite">
+      <div class="progress-header">
+        <div class="progress-status" id="progress-status">Starting up...</div>
+        <div class="progress-pct" id="progress-pct">0%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="steps-grid" id="steps-grid"></div>
+    </div>
+
+  </div><!-- /landing -->
+
+  <!-- RESULTS -->
+  <div id="results-view" aria-label="Analysis results">
+    <div class="results-layout">
+
+      <!-- SIDEBAR -->
+      <nav class="results-nav" aria-label="Analysis sections">
+        <div class="nav-header">Analysis</div>
+        <div class="nav-item active" onclick="showPanel('summary', this)">
+          <span class="nav-num">&#9788;</span>
+          <span class="nav-label">Summary</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('brief', this)">
+          <span class="nav-num">01</span>
+          <span class="nav-label">Brief</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('assumptions', this)">
+          <span class="nav-num">02</span>
+          <span class="nav-label">What AI Assumes</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('gaps', this)">
+          <span class="nav-num">03</span>
+          <span class="nav-label">What AI Misses</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('contamination', this)">
+          <span class="nav-num">04</span>
+          <span class="nav-label">Client Hypotheses</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('drift', this)">
+          <span class="nav-num">05</span>
+          <span class="nav-label">Temporal Drift</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('competitors', this)">
+          <span class="nav-num">06</span>
+          <span class="nav-label">Brand Priming</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('archaeology', this)">
+          <span class="nav-num">07</span>
+          <span class="nav-label">Where It Comes From</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('methodology', this)">
+          <span class="nav-num">08</span>
+          <span class="nav-label">How to Research It</span>
+        </div>
+        <div class="nav-divider"></div>
+        <button class="btn-export" onclick="exportReport()">&#8595; Export report</button>
+        <button class="btn-new" onclick="newAnalysis()">+ New brief</button>
+      </nav>
+
+      <!-- CONTENT AREA -->
+      <div class="results-content">
+
+        <!-- SUMMARY -->
+        <div class="panel active" id="panel-summary">
+          <div id="panel-summary-content"></div>
+        </div>
+
+        <!-- 01 BRIEF -->
+        <div class="panel" id="panel-brief">
+          <div class="section-title">
+            <div class="section-eyebrow">01 / Brief</div>
+            <h2>What BRIEF read</h2>
+            <p>Make sure this matches what you meant before reading the rest.</p>
+          </div>
+          <div id="panel-brief-content"></div>
+        </div>
+
+        <!-- 02 ASSUMPTIONS -->
+        <div class="panel" id="panel-assumptions">
+          <div class="section-title">
+            <div class="section-eyebrow">02 / What AI Assumes</div>
+            <h2>What AI assumes about this topic</h2>
+            <p>Pulled from 6 consumer-style queries and 4 persona variants. Your respondents have likely seen most of this already.</p>
+          </div>
+          <div id="panel-assumptions-content"></div>
+        </div>
+
+        <!-- 03 GAPS -->
+        <div class="panel" id="panel-gaps">
+          <div class="section-title">
+            <div class="section-eyebrow">03 / What AI Misses</div>
+            <h2>What AI gets wrong about your audience</h2>
+            <p>What AI leans on too heavily, what it skips, and the questions neither the client nor AI is asking.</p>
+          </div>
+          <div id="panel-gaps-content"></div>
+        </div>
+
+        <!-- 04 CONTAMINATION -->
+        <div class="panel" id="panel-contamination">
+          <div class="section-title">
+            <div class="section-eyebrow">04 / Client Hypotheses</div>
+            <h2>Are the client's hypotheses actually theirs?</h2>
+            <p>How much of what your client "knows" came from AI rather than the market. A high score means test the assumption before you build research around it.</p>
+          </div>
+          <div id="panel-contamination-content"></div>
+        </div>
+
+        <!-- 05 DRIFT -->
+        <div class="panel" id="panel-drift">
+          <div class="section-title">
+            <div class="section-eyebrow">05 / Temporal Drift</div>
+            <h2>How stale is AI's picture of this market?</h2>
+            <p>AI training data stops at a point in time. Markets keep moving. These are the assumptions most likely to be out of date.</p>
+          </div>
+          <div id="panel-drift-content"></div>
+        </div>
+
+        <!-- 06 COMPETITORS -->
+        <div class="panel" id="panel-competitors">
+          <div class="section-title">
+            <div class="section-eyebrow">06 / Brand Priming</div>
+            <h2>Who AI puts in the room before you do</h2>
+            <p>Brands that show up in AI answers without being asked for. Your respondents have probably run into them too.</p>
+          </div>
+          <div id="panel-competitors-content"></div>
+        </div>
+
+        <!-- 07 ARCHAEOLOGY -->
+        <div class="panel" id="panel-archaeology">
+          <div class="section-title">
+            <div class="section-eyebrow">07 / Where It Comes From</div>
+            <h2>Where these assumptions come from</h2>
+            <p>The kinds of sources that shaped how AI sees this topic, and whose perspective is missing from them.</p>
+          </div>
+          <div id="panel-archaeology-content"></div>
+        </div>
+
+        <!-- 08 METHODOLOGY -->
+        <div class="panel" id="panel-methodology">
+          <div class="section-title">
+            <div class="section-eyebrow">08 / How to Research It</div>
+            <h2>How to research this without AI contaminating your findings</h2>
+            <p>Method recommendations based on the specific gaps above.</p>
+          </div>
+          <div id="panel-methodology-content"></div>
+        </div>
+
+      </div><!-- /results-content -->
+    </div><!-- /results-layout -->
+  </div><!-- /results-view -->
+
+</div><!-- /page-wrap -->
+
+<script>
+  let allData = null;
+  const STEP_LABELS = [
+    "Reading your brief",
+    "Working out how people ask about this",
+    "Asking AI the same question 10 ways",
+    "Finding patterns in what AI says",
+    "Comparing AI to your actual audience",
+    "Checking how much is out of date",
+    "Scoring the client's assumptions",
+    "Identifying which brands AI mentions",
+    "Tracing where assumptions come from",
+    "Working out how to research this",
+    "Scoring overall design confidence"
+  ];
+
+  function scoreCls(label) {
+    if (!label) return 's-medium';
+    const l = label.toLowerCase();
+    if (l === 'critical') return 's-critical';
+    if (l === 'high')     return 's-high';
+    if (l === 'medium')   return 's-medium';
+    return 's-low';
+  }
+
+  function infCls(level) {
+    if (!level) return 'inf-marginal';
+    const l = level.toLowerCase();
+    if (l === 'dominant')    return 'inf-dominant';
+    if (l === 'significant') return 'inf-significant';
+    if (l === 'marginal')    return 'inf-marginal';
+    return 'inf-absent';
+  }
+
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showPanel(name, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (el) el.classList.add('active');
+  }
+
+  function newAnalysis() {
+    document.getElementById('results-view').style.display = 'none';
+    document.getElementById('landing').style.display = 'block';
+    document.getElementById('brief-input').value = '';
+    document.getElementById('run-btn').disabled = false;
+    document.getElementById('progress-section').style.display = 'none';
+    document.getElementById('steps-grid').innerHTML = '';
+    document.getElementById('progress-fill').style.width = '0%';
+  }
+
+  async function runAnalysis() {
+    const brief = document.getElementById('brief-input').value.trim();
+    if (!brief || brief.length < 50) {
+      showError('Please paste a research brief of at least 50 characters.');
+      return;
+    }
+    hideError();
+    document.getElementById('run-btn').disabled = true;
+    document.getElementById('progress-section').style.display = 'block';
+
+    // Pre-populate step grid
+    const grid = document.getElementById('steps-grid');
+    grid.innerHTML = '';
+    STEP_LABELS.forEach((label, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'step-cell';
+      cell.id = 'step-cell-' + (i+1);
+      cell.innerHTML = `<div class="step-num">${String(i+1).padStart(2,'0')}</div>${label}`;
+      grid.appendChild(cell);
+    });
+
+    const resp = await fetch('/analyse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brief })
+    });
+
+    const { session_id, error } = await resp.json();
+    if (error) { showError(error); return; }
+
+    const es = new EventSource('/progress/' + session_id);
+
+    es.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+
+      if (msg.type === 'progress') {
+        document.getElementById('progress-status').textContent = msg.step + '...';
+        document.getElementById('progress-pct').textContent = msg.pct + '%';
+        document.getElementById('progress-fill').style.width = msg.pct + '%';
+
+        // Mark current active, prev done
+        const cur = document.getElementById('step-cell-' + msg.number);
+        if (cur) { cur.classList.add('active'); cur.classList.remove('done'); }
+        if (msg.number > 1) {
+          const prev = document.getElementById('step-cell-' + (msg.number - 1));
+          if (prev) { prev.classList.remove('active'); prev.classList.add('done'); }
+        }
+      }
+
+      if (msg.type === 'result') {
+        es.close();
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('progress-status').textContent = 'Done. Here\'s what BRIEF found.';
+        document.getElementById('progress-pct').textContent = '100%';
+        document.querySelectorAll('.step-cell').forEach(c => { c.classList.remove('active'); c.classList.add('done'); });
+
+        if (msg.status === 'error') {
+          showError('Analysis failed: ' + msg.message);
+          document.getElementById('run-btn').disabled = false;
+          return;
+        }
+
+        allData = msg.data;
+        renderAll(allData);
+        document.getElementById('landing').style.display = 'none';
+        document.getElementById('results-view').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+  }
+
+  function renderAll(d) {
+    renderSummary(d);
+    renderBrief(d.parsed);
+    renderAssumptions(d.clusters);
+    renderGaps(d.gaps);
+    renderContamination(d.contamination);
+    renderDrift(d.temporal_drift);
+    renderCompetitors(d.competitor_intel);
+    renderArchaeology(d.archaeology);
+    renderMethodology(d.methodology);
+  }
+
+  function renderBrief(p) {
+    const hyps = (p.client_hypotheses || []).map(h => `<span class="tag">${esc(h)}</span>`).join('');
+    document.getElementById('panel-brief-content').innerHTML = `
+      <div class="meta-row">
+        <div class="meta-pill"><span class="meta-key">Category</span><span class="meta-val">${esc(p.category)}</span></div>
+        <div class="meta-pill"><span class="meta-key">Geography</span><span class="meta-val">${esc(p.geography)}</span></div>
+        <div class="meta-pill"><span class="meta-key">Method</span><span class="meta-val">${esc(p.methodology_hints)}</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Core question</div>
+        <p>${esc(p.core_question)}</p>
+        <div class="card-divider"></div>
+        <div class="card-label">Target audience</div>
+        <p>${esc(p.target_audience)}</p>
+        <div class="card-divider"></div>
+        <div class="card-label">Research objective</div>
+        <p>${esc(p.research_objective)}</p>
+        ${hyps ? `<div class="card-divider"></div><div class="card-label">Client hypotheses</div><div class="tag-row">${hyps}</div>` : ''}
+      </div>`;
+  }
+
+  function renderAssumptions(c) {
+    const list = (c.dominant_assumptions || []).map(a => `
+      <div class="assumption-item">
+        <div class="assumption-theme">${esc(a.theme)}</div>
+        <div class="assumption-freq">${esc(a.frequency)}</div>
+        <div class="assumption-desc">${esc(a.description)}</div>
+        ${a.example_quote ? `<div class="assumption-quote">"${esc(a.example_quote)}"</div>` : ''}
+      </div>`).join('');
+
+    document.getElementById('panel-assumptions-content').innerHTML = `
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Dominant perspective</div>
+          <p>${esc(c.dominant_perspective)}</p>
+          <div class="card-divider"></div>
+          <div class="card-label">Geographic bias</div>
+          <p>${esc(c.geographic_bias)}</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Assumed reader</div>
+          <p>${esc(c.language_register)}</p>
+          <div class="card-divider"></div>
+          <div class="card-label">Persona divergence</div>
+          <p>${esc(c.persona_divergence)}</p>
+        </div>
+      </div>
+      ${list}`;
+  }
+
+  function renderGaps(g) {
+    const over = (g.overrepresented || []).map(o => `
+      <div class="gap-item">
+        <div class="gap-perspective" class="text-amber">${esc(o.perspective)}</div>
+        <div class="gap-explanation">${esc(o.explanation)}</div>
+      </div>`).join('');
+
+    const under = (g.underrepresented || []).map(o => `
+      <div class="gap-item">
+        <div class="gap-perspective" class="text-danger">${esc(o.perspective)}</div>
+        <div class="gap-explanation">${esc(o.explanation)}</div>
+      </div>`).join('');
+
+    const unknowns = (g.unknown_unknowns || []).map(q => `
+      <div class="unknown-item">
+        <span class="unknown-q">?</span>
+        <span class="unknown-text">${esc(q)}</span>
+      </div>`).join('');
+
+    document.getElementById('panel-gaps-content').innerHTML = `
+      <div class="grid-2">
+        <div>
+          <div class="card-label mb-3">Over-represented by AI</div>
+          ${over}
+        </div>
+        <div>
+          <div class="card-label mb-3">Under-represented by AI</div>
+          ${under}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Audience mismatch</div>
+        <p>${esc(g.audience_mismatch)}</p>
+        <div class="card-divider"></div>
+        <div class="card-label">Risk to research</div>
+        <p>${esc(g.risk_to_research)}</p>
+      </div>
+      <div class="card-label mb-3">Questions nobody is asking</div>
+      ${unknowns}`;
+  }
+
+  function renderContamination(c) {
+    const cls = scoreCls(c.overall_contamination_level);
+    const hyps = (c.hypotheses_assessed || []).map(h => {
+      const hcls = scoreCls(h.score_label);
+      const score = h.contamination_score || 0;
+      return `
+        <div class="hyp-item">
+          <div class="hyp-top">
+            <div class="hyp-text">${esc(h.hypothesis)}</div>
+            <span class="badge-score ${hcls}">${score}/100 &nbsp; ${esc(h.score_label)}</span>
+          </div>
+          <div class="score-track"><div class="score-fill ${hcls.replace('s-','')}" style="width:${score}%"></div></div>
+          <div class="hyp-explanation">${esc(h.explanation)}</div>
+          <div class="hyp-rec">${esc(h.recommendation)}</div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('panel-contamination-content').innerHTML = `
+      <div class="card card-mb-5">
+        <div class="badge-row">
+          <div class="card-label no-margin">Overall contamination</div>
+          <span class="badge-score ${cls}">${esc(c.overall_contamination_level)}</span>
+        </div>
+        <p>${esc(c.overall_explanation)}</p>
+        ${c.most_dangerous_assumption ? `<div class="card-divider"></div><div class="card-label">Most dangerous assumption</div><p class="text-danger">${esc(c.most_dangerous_assumption)}</p>` : ''}
+      </div>
+      ${hyps}`;
+  }
+
+  function renderDrift(d) {
+    const cls = scoreCls(d.overall_drift_risk);
+    const items = (d.stale_assumptions || []).map(s => `
+      <div class="drift-item">
+        <div class="drift-assumption">${esc(s.assumption)}</div>
+        <div class="drift-why">${esc(s.why_stale)}</div>
+        <div class="drift-impl">${esc(s.research_implication)}</div>
+      </div>`).join('');
+
+    const fast = (d.fast_moving_dimensions || []).map(f => `<span class="tag">${esc(f)}</span>`).join('');
+
+    document.getElementById('panel-drift-content').innerHTML = `
+      <div class="card card-mb-5">
+        <div class="badge-row">
+          <div class="card-label no-margin">Drift risk</div>
+          <span class="badge-score ${cls}">${esc(d.overall_drift_risk)}</span>
+        </div>
+        <p>${esc(d.drift_explanation)}</p>
+        ${d.recommendation ? `<div class="card-divider"></div><p><strong>${esc(d.recommendation)}</strong></p>` : ''}
+      </div>
+      ${items}
+      ${fast ? `<div class="card"><div class="card-label">Fast-moving dimensions to probe</div><div class="tag-row">${fast}</div></div>` : ''}`;
+  }
+
+  function renderCompetitors(ci) {
+    const rows = (ci.brands_mentioned || []).map(b => `
+      <tr>
+        <td>${esc(b.brand)}</td>
+        <td>${esc(b.frequency)}</td>
+        <td>${esc(b.framing)}</td>
+        <td><span class="badge-score ${scoreCls(b.priming_risk)}">${esc(b.priming_risk)}</span></td>
+      </tr>`).join('');
+
+    document.getElementById('panel-competitors-content').innerHTML = `
+      <div class="card card-mb-4">
+        <div class="card-label">AI category leader</div>
+        <p>${esc(ci.category_leader_in_ai)}</p>
+        <div class="card-divider"></div>
+        <div class="card-label">Invisible competitors</div>
+        <p>${esc(ci.invisible_competitors)}</p>
+      </div>
+      ${rows ? `<div class="card"><div class="card-label">Brands in AI responses</div>
+        <table class="brand-table">
+          <thead><tr><th>Brand</th><th>Frequency</th><th>Framing</th><th>Priming risk</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>` : ''}
+      ${ci.discussion_guide_implication ? `<div class="card"><div class="card-label">Discussion guide implication</div><p>${esc(ci.discussion_guide_implication)}</p></div>` : ''}`;
+  }
+
+  function renderArchaeology(a) {
+    const sources = (a.source_landscape || []).map(s => `
+      <div class="source-item">
+        <span class="inf-pill ${infCls(s.influence_level)}">${esc(s.influence_level)}</span>
+        <div>
+          <div class="source-type">${esc(s.source_type)}</div>
+          <div class="source-contrib">${esc(s.what_it_contributes)}</div>
+          <div class="source-voice">${esc(s.whose_voice)}</div>
+        </div>
+      </div>`).join('');
+
+    const absent = (a.absent_voices || []).map(v => `<span class="tag absent">${esc(v)}</span>`).join('');
+
+    const grounded = a.grounded === true;
+    const banner = grounded
+      ? `<div class="iq-banner"><span class="iq-banner-dot"></span><span class="iq-banner-text">Grounded in live web sources via Foundry IQ</span></div>`
+      : '';
+
+    const citations = (a.sources || []).map(c => `
+      <a class="citation" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">
+        <div class="citation-title">${esc(c.title)}</div>
+        ${c.url ? `<div class="citation-url">${esc(c.url)}</div>` : ''}
+        ${c.snippet ? `<div class="citation-snippet">${esc(c.snippet)}</div>` : ''}
+      </a>`).join('');
+
+    document.getElementById('panel-archaeology-content').innerHTML = `
+      ${banner}
+      <div class="card card-mb-4">
+        <div class="card-label">Dominant narrative origin</div>
+        <p>${esc(a.dominant_narrative_origin)}</p>
+        <div class="card-divider"></div>
+        <div class="card-label">Implication for research design</div>
+        <p>${esc(a.implication_for_research)}</p>
+        ${a.decolonisation_note ? `<div class="card-divider"></div><div class="card-label">Anglo-centrism note</div><p class="text-amber">${esc(a.decolonisation_note)}</p>` : ''}
+      </div>
+      <div class="card-label mb-3">Source landscape</div>
+      ${sources}
+      ${citations ? `<div class="card-label" style="margin-bottom:var(--sp-3);margin-top:var(--sp-5)">Cited web sources (Foundry IQ)</div>${citations}` : ''}
+      ${absent ? `<div class="card"><div class="card-label">Absent voices</div><div class="tag-row">${absent}</div></div>` : ''}`;
+  }
+
+  function renderMethodology(m) {
+    const items = (m.methodology_breakdown || []).map(mb => `
+      <div class="method-item">
+        <div class="method-dim">${esc(mb.dimension)}</div>
+        <div class="method-rec">${esc(mb.recommended_method)}</div>
+        <div class="method-rationale">${esc(mb.rationale)}</div>
+        ${mb.ai_bias_risk ? `<div class="method-risk">Risk: ${esc(mb.ai_bias_risk)}</div>` : ''}
+      </div>`).join('');
+
+    const qual_dims = (m.critical_qual_dimensions || []).map(q => `<span class="tag">${esc(q)}</span>`).join('');
+
+    document.getElementById('panel-methodology-content').innerHTML = `
+      <div class="card card-mb-4">
+        <div class="card-label">Recommended approach</div>
+        <p class="rec-heading">${esc(m.recommended_approach)}</p>
+        ${m.sample_design_notes ? `<div class="card-divider"></div><div class="card-label">Sample design notes</div><p>${esc(m.sample_design_notes)}</p>` : ''}
+        ${m.stimulus_material_warning ? `<div class="card-divider"></div><div class="card-label" class="text-amber">Stimulus material warning</div><p class="text-amber">${esc(m.stimulus_material_warning)}</p>` : ''}
+      </div>
+      ${m.projective_techniques_needed ? `<div class="card" class="accent-card"><div class="card-label" class="text-accent">Projective techniques needed</div><p>${esc(m.projective_rationale)}</p></div>` : ''}
+      ${items}
+      ${qual_dims ? `<div class="card"><div class="card-label">Must be qual - cannot survey</div><div class="tag-row">${qual_dims}</div></div>` : ''}`;
+  }
+
+  function gaugeColor(score) {
+    if (score >= 70) return 'var(--ok)';
+    if (score >= 50) return 'var(--amber)';
+    if (score >= 30) return 'var(--danger)';
+    return 'var(--danger-light)';
+  }
+
+  function confTagStyle(label) {
+    const l = (label || '').toLowerCase();
+    if (l === 'strong')      return 'background:var(--ok-dim);color:var(--ok)';
+    if (l === 'adequate')    return 'background:var(--amber-dim);color:var(--amber)';
+    if (l === 'fragile')     return 'background:var(--danger-dim);color:var(--danger)';
+    return 'background:var(--danger-dim);color:var(--danger-light)';
+  }
+
+  function renderSummary(d) {
+    const c = d.confidence || {};
+    const score = c.confidence_score != null ? c.confidence_score : 50;
+    const color = gaugeColor(score);
+    const circumference = 2 * Math.PI * 56;
+    const offset = circumference * (1 - score / 100);
+
+    const risks = (c.top_three_risks || []).map((r, i) => `
+      <div class="risk-item">
+        <span class="risk-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="risk-text">${esc(r)}</span>
+      </div>`).join('');
+
+    // At-a-glance tiles pulling the headline finding from each layer
+    const tiles = [
+      { label: 'Hypotheses', finding: (d.contamination||{}).overall_contamination_level ? 'Contamination: ' + esc(d.contamination.overall_contamination_level) : 'n/a', panel: 'contamination' },
+      { label: 'Temporal drift', finding: (d.temporal_drift||{}).overall_drift_risk ? 'Risk: ' + esc(d.temporal_drift.overall_drift_risk) : 'n/a', panel: 'drift' },
+      { label: 'Blind spots', finding: ((d.gaps||{}).underrepresented||[]).length + ' under-represented perspectives', panel: 'gaps' },
+      { label: 'Brand priming', finding: ((d.competitor_intel||{}).brands_mentioned||[]).length + ' brands appear unprompted', panel: 'competitors' },
+      { label: 'Open questions', finding: ((d.gaps||{}).unknown_unknowns||[]).length + ' questions nobody is asking', panel: 'gaps' },
+      { label: 'Method', finding: esc(((d.methodology||{}).recommended_approach||'n/a').split(' - ')[0].split(' with ')[0]), panel: 'methodology' }
+    ].map(t => `
+      <div class="summary-tile" onclick="jumpTo('${t.panel}')">
+        <div class="summary-tile-head">
+          <span class="summary-tile-label">${t.label}</span>
+        </div>
+        <div class="summary-tile-finding">${t.finding}</div>
+      </div>`).join('');
+
+    document.getElementById('panel-summary-content').innerHTML = `
+      <div class="section-title">
+        <div class="section-eyebrow">Research design confidence</div>
+        <h2>Is this research set up to tell you anything new?</h2>
+        <p>One read on whether this brief is set up to tell you something new, or just confirm what AI would have told the client anyway.</p>
+      </div>
+
+      <div class="confidence-hero">
+        <div class="gauge">
+          <svg width="132" height="132" viewBox="0 0 132 132">
+            <circle class="gauge-track" cx="66" cy="66" r="56"></circle>
+            <circle class="gauge-fill" cx="66" cy="66" r="56"
+              stroke="${color}"
+              stroke-dasharray="${circumference}"
+              stroke-dashoffset="${circumference}"
+              id="gauge-fill-circle"></circle>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-num" style="color:${color}">${score}</div>
+            <div class="gauge-unit">/ 100</div>
+          </div>
+        </div>
+        <div class="confidence-detail">
+          <span class="confidence-label-tag" style="${confTagStyle(c.confidence_label)}">${esc(c.confidence_label || 'Adequate')}</span>
+          <div class="confidence-headline">${esc(c.headline || '')}</div>
+          <div class="confidence-rationale">${esc(c.score_rationale || '')}</div>
+        </div>
+      </div>
+
+      ${risks ? `<div class="card">
+        <div class="card-label">Fix these before fieldwork</div>
+        <div class="risk-list">${risks}</div>
+        ${c.what_would_raise_it ? `<div class="card-divider"></div><div class="card-label">Biggest single improvement</div><p class="text-accent">${esc(c.what_would_raise_it)}</p>` : ''}
+      </div>` : ''}
+
+      <div class="card-label" style="margin-bottom:var(--sp-3)">At a glance</div>
+      <div class="summary-grid">${tiles}</div>
+    `;
+
+    // Animate the gauge after a tick
+    setTimeout(() => {
+      const circle = document.getElementById('gauge-fill-circle');
+      if (circle) circle.style.strokeDashoffset = offset;
+    }, 200);
+  }
+
+  function jumpTo(panel) {
+    const navItems = document.querySelectorAll('.nav-item');
+    let target = null;
+    navItems.forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + panel + "'")) target = n;
+    });
+    showPanel(panel, target);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function exportReport() {
+    if (!allData) return;
+    const d = allData;
+    const c = d.confidence || {};
+    const p = d.parsed || {};
+    let md = '';
+    md += '# BRIEF - AI Contamination Report\n\n';
+    md += '## Research Design Confidence: ' + (c.confidence_score != null ? c.confidence_score : 'n/a') + '/100 (' + (c.confidence_label || '') + ')\n\n';
+    md += '> ' + (c.headline || '') + '\n\n';
+    md += (c.score_rationale || '') + '\n\n';
+
+    if ((c.top_three_risks || []).length) {
+      md += '### Fix before fieldwork\n';
+      c.top_three_risks.forEach((r, i) => { md += (i+1) + '. ' + r + '\n'; });
+      md += '\n';
+    }
+
+    md += '---\n\n## Brief\n\n';
+    md += '- **Category:** ' + (p.category || '') + '\n';
+    md += '- **Geography:** ' + (p.geography || '') + '\n';
+    md += '- **Audience:** ' + (p.target_audience || '') + '\n';
+    md += '- **Objective:** ' + (p.research_objective || '') + '\n\n';
+
+    const cont = d.contamination || {};
+    md += '## Hypothesis Contamination: ' + (cont.overall_contamination_level || '') + '\n\n';
+    md += (cont.overall_explanation || '') + '\n\n';
+    (cont.hypotheses_assessed || []).forEach(h => {
+      md += '- **[' + (h.contamination_score||0) + '/100 ' + (h.score_label||'') + ']** ' + (h.hypothesis||'') + '\n';
+      md += '  - ' + (h.recommendation||'') + '\n';
+    });
+    md += '\n';
+
+    const dr = d.temporal_drift || {};
+    md += '## Temporal Drift: ' + (dr.overall_drift_risk || '') + '\n\n' + (dr.drift_explanation || '') + '\n\n';
+
+    const m = d.methodology || {};
+    md += '## Recommended Methodology\n\n' + (m.recommended_approach || '') + '\n\n';
+    md += (m.sample_design_notes || '') + '\n\n';
+
+    const arch = d.archaeology || {};
+    if ((arch.sources || []).length) {
+      md += '## Where these assumptions come from (Foundry IQ, web-grounded)\n\n';
+      md += (arch.dominant_narrative_origin || '') + '\n\n';
+      md += '### Cited sources\n';
+      arch.sources.forEach(s => {
+        md += '- [' + (s.title || 'Source') + '](' + (s.url || '') + ')\n';
+      });
+      md += '\n';
+    }
+
+    md += '---\n_Generated by BRIEF - Bias & Research Intelligence Evaluation Framework. Built on Microsoft Foundry with Foundry IQ web grounding._\n';
+
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'BRIEF-report.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-box');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('run-btn').disabled = false;
+  }
+
+  function hideError() {
+    document.getElementById('error-box').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
