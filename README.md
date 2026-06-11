@@ -42,6 +42,10 @@ The report covers:
 
 ---
 
+## Architecture
+
+![BRIEF architecture diagram](architecture.png)
+
 ## How the reasoning works
 
 BRIEF is a multi-step reasoning agent. Each step is a focused reasoning task with its own domain-expert prompt, and each step reasons over the findings of the steps before it. The chain is deliberately sequential: the confidence score in step eleven is only meaningful because steps one through ten did their work first.
@@ -102,7 +106,7 @@ If retrieval is ever unavailable, the step falls back to model-only analysis, so
 
 ## Built during the hacking window
 
-BRIEF was built new for this hackathon. It builds on the thinking behind an earlier personal project of mine (AISOV, a tool that measured whether brands appear in AI responses to category prompts), but the eleven-step reasoning chain, the Foundry deployment, the Foundry IQ grounding, the confidence-scoring layer, and the entire interface were all built during the event.
+BRIEF was built new for this hackathon. The idea grew out of a problem I keep running into in my own research work, but the eleven-step reasoning chain, the Foundry deployment, the Foundry IQ grounding, the confidence-scoring layer, and the entire interface were all built during the event.
 
 ---
 
