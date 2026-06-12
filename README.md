@@ -28,7 +28,7 @@ BRIEF maps it. You paste in a research brief, and the agent works out what AI cu
 
 ## What it does
 
-BRIEF takes a plain-language research brief and runs it through an eleven-step reasoning chain. The output is a structured report a researcher can act on, ending in a single Research Design Confidence Score that says how likely the study, as framed, is to surface genuine insight rather than echo the model.
+BRIEF takes a plain-language research brief and routes it through a multi-agent system of eleven specialised agents, coordinated by an orchestrator. The output is a structured report a researcher can act on, ending in a single Research Design Confidence Score that says how likely the study, as framed, is to surface genuine insight rather than echo the model.
 
 The report covers:
 
@@ -46,45 +46,55 @@ The report covers:
 
 ![BRIEF architecture diagram](architecture.png)
 
-## How the reasoning works
+## How it works: a multi-agent system
 
-BRIEF is a multi-step reasoning agent. Each step is a focused reasoning task with its own domain-expert prompt, and each step reasons over the findings of the steps before it. The chain is deliberately sequential: the confidence score in step eleven is only meaningful because steps one through ten did their work first.
+BRIEF is a multi-agent system. An orchestrator (`run_brief`) takes the brief and routes it through eleven specialised agents, each with a single job, its own domain-expert instructions, and its own structured output contract. Each agent hands its findings to the next, so the system as a whole decomposes a hard, open-ended problem ("is this research design contaminated?") into focused tasks that build on one another.
+
+The design follows three reasoning patterns the track describes:
+
+- **Role-based specialisation** - each agent owns one part of the problem (parsing, querying, contamination scoring, source archaeology, and so on) rather than one model trying to do everything at once.
+- **Planner then executors** - the first agents parse the brief and plan how the topic should be probed; later agents execute that plan against the model and the live web.
+- **Critic / synthesis** - the final agent reviews every other agent's output and produces a single Research Design Confidence Score, acting as a verifier over the whole run rather than adding another isolated finding.
 
 ```
 Research brief
    |
-   1   PARSE           structure the brief: category, audience, objective, hypotheses
-   2   GENERATE        work out how real people actually query this topic
-   3   QUERY           ask the model in 6 base voices + 4 persona variants
-   4   CLUSTER         find the dominant assumptions across every response
-   5   GAP ANALYSIS    compare the AI picture against the real target audience
-   6   TEMPORAL DRIFT  flag assumptions likely out of date
-   7   CONTAMINATION   score each client hypothesis against AI consensus
-   8   COMPETITORS     surface brands the model raises unprompted
-   9   ARCHAEOLOGY     trace where the assumptions come from   [grounded by Foundry IQ]
-  10   METHODOLOGY     recommend how to research around the gaps
-  11   CONFIDENCE      synthesise everything into one design-confidence score
+   v
+ORCHESTRATOR  (run_brief: routes the brief, passes state between agents)
    |
+   1   PARSE agent          structure the brief: category, audience, objective, hypotheses
+   2   GENERATE agent       work out how real people actually query this topic
+   3   QUERY agent          probe the model in 6 base voices + 4 persona variants
+   4   CLUSTER agent        find the dominant assumptions across every response
+   5   GAP agent            compare the AI picture against the real target audience
+   6   DRIFT agent          flag assumptions likely out of date
+   7   CONTAMINATION agent  score each client hypothesis against AI consensus
+   8   COMPETITOR agent     surface brands the model raises unprompted
+   9   ARCHAEOLOGY agent    trace where the assumptions come from   [grounded by Foundry IQ]
+  10   METHODOLOGY agent    recommend how to research around the gaps
+  11   SYNTHESIS agent      review all findings into one design-confidence score
+   |
+   v
 Structured report
 ```
 
-Every step runs inside per-step error recovery, so a single failed step falls back to a safe default rather than breaking the whole run.
+Each agent runs inside its own error recovery, so if one agent fails it returns a safe fallback and the orchestrator continues the run rather than the whole system breaking.
 
 ---
 
 ## Stack
 
-- **Microsoft Foundry** project with a `gpt-4.1-mini` deployment powering all eleven reasoning steps
-- **Foundry IQ** knowledge base with a web knowledge source (Grounding with Bing), backed by Azure AI Search agentic retrieval, grounding step nine in real cited sources
-- **Python** agent and reasoning pipeline (`agent.py`, `foundry_iq.py`)
-- **Flask** backend (`app.py`) streaming live step-by-step progress over server-sent events
+- **Microsoft Foundry** project with a `gpt-4.1-mini` deployment powering all eleven agents
+- **Foundry IQ** knowledge base with a web knowledge source (Grounding with Bing), backed by Azure AI Search agentic retrieval, grounding the archaeology agent in real cited sources
+- **Python** orchestrator and agent definitions (`agent.py`, `foundry_iq.py`)
+- **Flask** backend (`app.py`) streaming each agent's progress live over server-sent events
 - **Vanilla HTML, CSS and JavaScript** frontend (`templates/index.html`) - single file, no framework
 
 ---
 
 ## How Foundry IQ is used
 
-Step nine, Assumption Archaeology, is the IQ-grounded step, and it is the heart of what makes BRIEF more than a clever prompt chain.
+The archaeology agent, which traces where a topic's assumptions originate, is the IQ-grounded agent, and it is the heart of what makes BRIEF more than a clever prompt chain.
 
 Instead of letting the model guess where a topic's assumptions originate, BRIEF queries a Foundry IQ knowledge base configured with a web knowledge source and medium retrieval reasoning effort. The agentic retrieval engine plans subqueries, searches the live web, and returns synthesised findings together with source references. BRIEF feeds those grounded findings into its analysis and shows the real, clickable citations in the report.
 
@@ -106,7 +116,7 @@ If retrieval is ever unavailable, the step falls back to model-only analysis, so
 
 ## Built during the hacking window
 
-BRIEF was built new for this hackathon. The idea grew out of a problem I keep running into in my own research work, but the eleven-step reasoning chain, the Foundry deployment, the Foundry IQ grounding, the confidence-scoring layer, and the entire interface were all built during the event.
+BRIEF was built new for this hackathon. The idea grew out of a problem I keep running into in my own research work, but the multi-agent system, the orchestrator, the Foundry deployment, the Foundry IQ grounding, the confidence-scoring agent, and the entire interface were all built during the event.
 
 ---
 
