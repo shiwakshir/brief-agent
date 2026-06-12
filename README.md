@@ -6,6 +6,8 @@
 
 Built for the Microsoft Agents League hackathon, Reasoning Agents track, on Microsoft Foundry.
 
+> **Track fit:** BRIEF is an original scenario for the Reasoning Agents track. It meets the track's core requirements - a multi-agent system on Microsoft Foundry, multi-step reasoning, and Microsoft IQ integration via Foundry IQ - applied to a different real problem than the two example scenarios. See "How it works" below for the agent architecture and the reasoning patterns it uses.
+
 ---
 
 ## Why I built this
